@@ -1,82 +1,93 @@
 import { createClient } from "@supabase/supabase-js";
 
-function stripQuotes(value: string) {
-  const trimmed = value.trim();
-  if ((trimmed.startsWith('"') && trimmed.endsWith('"')) || (trimmed.startsWith("'") && trimmed.endsWith("'"))) {
-    return trimmed.slice(1, -1).trim();
+function cleanUrl(value?: string) {
+  if (!value) return "";
+  return value
+    .trim()
+    .replace(/^['"]|['"]$/g, "")
+    .replace(/\/rest\/v1\/?$/, "")
+    .replace(/\/$/, "");
+}
+
+function readSupabaseUrl() {
+  return cleanUrl(
+    process.env.NEXT_PUBLIC_SUPABASE_URL ||
+      process.env.SUPABASE_URL ||
+      process.env.POSTGRES_URL
+  );
+}
+
+function readSupabaseKey() {
+  return (
+    process.env.SUPABASE_SERVICE_ROLE_KEY ||
+    process.env.SUPABASE_SERVICE_KEY ||
+    process.env.SUPABASE_SECRET_KEY ||
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+    process.env.SUPABASE_ANON_KEY ||
+    ""
+  ).trim();
+}
+
+export function getSupabaseDebugInfo() {
+  const rawUrl =
+    process.env.NEXT_PUBLIC_SUPABASE_URL ||
+    process.env.SUPABASE_URL ||
+    process.env.POSTGRES_URL ||
+    "";
+
+  const url = readSupabaseUrl();
+  const key = readSupabaseKey();
+
+  let parsedHost: string | null = null;
+
+  try {
+    parsedHost = url ? new URL(url).host : null;
+  } catch {
+    parsedHost = "INVALID_URL";
   }
-  return trimmed;
-}
-
-export function normalizeSupabaseUrl(input?: string) {
-  if (!input) return "";
-  let url = stripQuotes(input);
-  url = url.replace(/\s+/g, "");
-  url = url.replace(/\/rest\/v1\/?$/i, "");
-  url = url.replace(/\/+$/g, "");
-  return url;
-}
-
-export function normalizeSupabaseKey(input?: string) {
-  if (!input) return "";
-  return stripQuotes(input).replace(/\s+/g, "");
-}
-
-export function getSupabaseConfig() {
-  const rawUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
-  const rawServiceRole = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
-  const rawAnon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
 
   return {
-    rawUrl,
-    url: normalizeSupabaseUrl(rawUrl),
-    serviceRole: normalizeSupabaseKey(rawServiceRole),
-    anonKey: normalizeSupabaseKey(rawAnon)
+    hasRawUrl: Boolean(rawUrl),
+    rawUrlPreview: rawUrl
+      ? rawUrl.slice(0, 28) + "..." + rawUrl.slice(-12)
+      : null,
+    normalizedUrl: url
+      ? url.slice(0, 28) + "..." + url.slice(-12)
+      : null,
+    parsedHost,
+    urlIncludesRestV1: rawUrl.includes("/rest/v1"),
+    hasKey: Boolean(key),
+    keyPrefix: key ? key.slice(0, 14) : null,
+    keyLength: key.length,
+    using: {
+      NEXT_PUBLIC_SUPABASE_URL: Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL),
+      SUPABASE_URL: Boolean(process.env.SUPABASE_URL),
+      POSTGRES_URL: Boolean(process.env.POSTGRES_URL),
+      SUPABASE_SERVICE_ROLE_KEY: Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY),
+      SUPABASE_SERVICE_KEY: Boolean(process.env.SUPABASE_SERVICE_KEY),
+      SUPABASE_SECRET_KEY: Boolean(process.env.SUPABASE_SECRET_KEY),
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: Boolean(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY),
+      SUPABASE_ANON_KEY: Boolean(process.env.SUPABASE_ANON_KEY)
+    }
   };
 }
 
 export function hasSupabaseEnv() {
-  const cfg = getSupabaseConfig();
-  return Boolean(cfg.url && cfg.serviceRole);
+  return Boolean(readSupabaseUrl() && readSupabaseKey());
 }
 
 export function createServiceClient() {
-  const cfg = getSupabaseConfig();
+  const url = readSupabaseUrl();
+  const key = readSupabaseKey();
 
-  if (!cfg.url || !cfg.serviceRole) {
-    throw new Error("Faltan NEXT_PUBLIC_SUPABASE_URL o SUPABASE_SERVICE_ROLE_KEY");
+  if (!url || !key) {
+    throw new Error("Faltan URL o KEY de Supabase en Vercel");
   }
 
-  return createClient(cfg.url, cfg.serviceRole, {
+  return createClient(url, key, {
     auth: {
       persistSession: false,
       autoRefreshToken: false
     }
   });
-}
-
-export function maskedConfigForDebug() {
-  const cfg = getSupabaseConfig();
-  let parsed: URL | null = null;
-  try {
-    parsed = cfg.url ? new URL(cfg.url) : null;
-  } catch {
-    parsed = null;
-  }
-
-  return {
-    hasRawUrl: Boolean(cfg.rawUrl),
-    rawUrlLength: cfg.rawUrl.length,
-    normalizedUrl: cfg.url ? `${cfg.url.slice(0, 12)}…${cfg.url.slice(-12)}` : null,
-    normalizedUrlLength: cfg.url.length,
-    parsedHost: parsed?.host || null,
-    parsedProtocol: parsed?.protocol || null,
-    urlIncludesRestV1: /\/rest\/v1\/?$/i.test(cfg.rawUrl),
-    hasServiceRole: Boolean(cfg.serviceRole),
-    serviceRolePrefix: cfg.serviceRole ? cfg.serviceRole.slice(0, 12) : null,
-    serviceRoleLength: cfg.serviceRole.length,
-    hasAnonKey: Boolean(cfg.anonKey),
-    anonKeyPrefix: cfg.anonKey ? cfg.anonKey.slice(0, 14) : null,
-    anonKeyLength: cfg.anonKey.length
-  };
 }
