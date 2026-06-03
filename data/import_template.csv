@@ -1,0 +1,2 @@
+name,year,start_date,end_date,venue_name,city,province,region,official_website,instagram_url,ticket_url,main_genres,avg_attendance,expected_attendance,sales_stage,lifecycle_stage,ticket_status,data_confidence
+Festival Ejemplo,2026,2026-07-10,2026-07-12,Recinto Ejemplo,Madrid,Madrid,Comunidad de Madrid,https://example.com,https://instagram.com/example,https://tickets.example.com,pop|urbano,25000,30000,Tramo 1,Venta activa,Disponible,baja
