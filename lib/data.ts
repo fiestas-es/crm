@@ -17,64 +17,6 @@ async function getFestivalsFromPostgres(): Promise<FestivalOverview[]> {
   return rows;
 }
 
-async function getContactsFromPostgres(festivalId?: string): Promise<Contact[]> {
-  const sql = getSql();
-
-  if (festivalId) {
-    const rows = await sql<Contact[]>`
-      select
-        c.*,
-        fc.responsibility,
-        fc.priority,
-        fc.relationship_status,
-        fc.owner_name
-      from public.festival_contacts fc
-      join public.contacts c on c.id = fc.contact_id
-      where fc.festival_id = ${festivalId}
-      order by fc.priority desc nulls last, c.updated_at desc nulls last
-      limit 200
-    `;
-
-    return rows;
-  }
-
-  const rows = await sql<Contact[]>`
-    select *
-    from public.contacts
-    order by updated_at desc nulls last
-    limit 500
-  `;
-
-  return rows;
-}
-
-async function getAlertsFromPostgres(): Promise<RadarAlert[]> {
-  const sql = getSql();
-
-  const rows = await sql<RadarAlert[]>`
-    select *
-    from public.radar_alerts_with_festival
-    where status = 'open'
-    order by created_at desc nulls last
-    limit 80
-  `;
-
-  return rows;
-}
-
-async function getProposalsFromPostgres(): Promise<Proposal[]> {
-  const sql = getSql();
-
-  const rows = await sql<Proposal[]>`
-    select *
-    from public.proposals_with_festival
-    order by created_at desc nulls last
-    limit 120
-  `;
-
-  return rows;
-}
-
 export async function getFestivals(): Promise<FestivalOverview[]> {
   noStore();
 
@@ -121,14 +63,6 @@ export async function getFestival(id: string) {
 
 export async function getContacts(festivalId?: string): Promise<Contact[]> {
   noStore();
-
-  if (hasPostgresEnv()) {
-    try {
-      return await getContactsFromPostgres(festivalId);
-    } catch (error) {
-      console.error("Postgres getContacts error:", error);
-    }
-  }
 
   if (!hasSupabaseEnv()) return mockContacts;
 
@@ -178,14 +112,6 @@ export async function getContacts(festivalId?: string): Promise<Contact[]> {
 export async function getRadarAlerts(): Promise<RadarAlert[]> {
   noStore();
 
-  if (hasPostgresEnv()) {
-    try {
-      return await getAlertsFromPostgres();
-    } catch (error) {
-      console.error("Postgres getRadarAlerts error:", error);
-    }
-  }
-
   if (!hasSupabaseEnv()) return mockAlerts;
 
   try {
@@ -212,14 +138,6 @@ export async function getRadarAlerts(): Promise<RadarAlert[]> {
 
 export async function getProposals(): Promise<Proposal[]> {
   noStore();
-
-  if (hasPostgresEnv()) {
-    try {
-      return await getProposalsFromPostgres();
-    } catch (error) {
-      console.error("Postgres getProposals error:", error);
-    }
-  }
 
   if (!hasSupabaseEnv()) return mockProposals;
 
