@@ -1,97 +1,252 @@
 import { unstable_noStore as noStore } from "next/cache";
 import { createServiceClient, hasSupabaseEnv } from "./supabase/service";
+import { getSql, hasPostgresEnv } from "./postgres";
 import { mockAlerts, mockContacts, mockFestivals, mockProposals } from "./mock-data";
 import type { Contact, FestivalOverview, Proposal, RadarAlert } from "./types";
 
+async function getFestivalsFromPostgres(): Promise<FestivalOverview[]> {
+  const sql = getSql();
+
+  const rows = await sql<FestivalOverview[]>`
+    select *
+    from public.festival_overview
+    order by opportunity_score desc nulls last
+    limit 500
+  `;
+
+  return rows;
+}
+
+async function getContactsFromPostgres(festivalId?: string): Promise<Contact[]> {
+  const sql = getSql();
+
+  if (festivalId) {
+    const rows = await sql<Contact[]>`
+      select
+        c.*,
+        fc.responsibility,
+        fc.priority,
+        fc.relationship_status,
+        fc.owner_name
+      from public.festival_contacts fc
+      join public.contacts c on c.id = fc.contact_id
+      where fc.festival_id = ${festivalId}
+      order by fc.priority desc nulls last, c.updated_at desc nulls last
+      limit 200
+    `;
+
+    return rows;
+  }
+
+  const rows = await sql<Contact[]>`
+    select *
+    from public.contacts
+    order by updated_at desc nulls last
+    limit 500
+  `;
+
+  return rows;
+}
+
+async function getAlertsFromPostgres(): Promise<RadarAlert[]> {
+  const sql = getSql();
+
+  const rows = await sql<RadarAlert[]>`
+    select *
+    from public.radar_alerts_with_festival
+    where status = 'open'
+    order by created_at desc nulls last
+    limit 80
+  `;
+
+  return rows;
+}
+
+async function getProposalsFromPostgres(): Promise<Proposal[]> {
+  const sql = getSql();
+
+  const rows = await sql<Proposal[]>`
+    select *
+    from public.proposals_with_festival
+    order by created_at desc nulls last
+    limit 120
+  `;
+
+  return rows;
+}
+
 export async function getFestivals(): Promise<FestivalOverview[]> {
   noStore();
-  if (!hasSupabaseEnv()) return mockFestivals;
-  const supabase = createServiceClient();
-  const { data, error } = await supabase
-    .from("festival_overview")
-    .select("*")
-    .order("opportunity_score", { ascending: false })
-    .limit(500);
 
-  if (error) {
-    console.error(error);
+  if (hasPostgresEnv()) {
+    try {
+      return await getFestivalsFromPostgres();
+    } catch (error) {
+      console.error("Postgres getFestivals error:", error);
+    }
+  }
+
+  if (!hasSupabaseEnv()) return mockFestivals;
+
+  try {
+    const supabase = createServiceClient();
+
+    const { data, error } = await supabase
+      .from("festival_overview")
+      .select("*")
+      .order("opportunity_score", { ascending: false })
+      .limit(500);
+
+    if (error) {
+      console.error(error);
+      return mockFestivals;
+    }
+
+    return data || [];
+  } catch (error) {
+    console.error("Supabase getFestivals fetch failed:", error);
     return mockFestivals;
   }
-  return data || [];
 }
 
 export async function getFestival(id: string) {
   const festivals = await getFestivals();
-  const festival = festivals.find((item) => item.festival_id === id || item.slug === id) || festivals[0];
+
+  const festival =
+    festivals.find((item) => item.festival_id === id || item.slug === id) ||
+    festivals[0];
+
   return festival;
 }
 
 export async function getContacts(festivalId?: string): Promise<Contact[]> {
   noStore();
-  if (!hasSupabaseEnv()) return mockContacts;
-  const supabase = createServiceClient();
 
-  if (festivalId) {
+  if (hasPostgresEnv()) {
+    try {
+      return await getContactsFromPostgres(festivalId);
+    } catch (error) {
+      console.error("Postgres getContacts error:", error);
+    }
+  }
+
+  if (!hasSupabaseEnv()) return mockContacts;
+
+  try {
+    const supabase = createServiceClient();
+
+    if (festivalId) {
+      const { data, error } = await supabase
+        .from("festival_contacts")
+        .select("contacts(*)")
+        .eq("festival_id", festivalId);
+
+      if (error) {
+        console.error(error);
+        return [];
+      }
+
+      return (data || [])
+        .map((row: any) => ({
+          ...(row.contacts || {}),
+          responsibility: row.responsibility || row.contacts?.role || null,
+          priority: row.priority || null,
+          relationship_status: row.relationship_status || null,
+          owner_name: row.owner_name || null
+        }))
+        .filter((contact: any) => contact.id);
+    }
+
     const { data, error } = await supabase
-      .from("festival_contacts")
-      .select("contacts(*)")
-      .eq("festival_id", festivalId);
+      .from("contacts")
+      .select("*")
+      .order("updated_at", { ascending: false })
+      .limit(500);
+
     if (error) {
       console.error(error);
-      return [];
+      return mockContacts;
     }
-    return (data || []).map((row: any) => ({
-      ...(row.contacts || {}),
-      responsibility: row.responsibility || row.contacts?.role || null,
-      priority: row.priority || null,
-      relationship_status: row.relationship_status || null,
-      owner_name: row.owner_name || null
-    })).filter((contact: any) => contact.id);
-  }
 
-  const { data, error } = await supabase.from("contacts").select("*").order("updated_at", { ascending: false }).limit(500);
-  if (error) {
-    console.error(error);
+    return data || [];
+  } catch (error) {
+    console.error("Supabase getContacts fetch failed:", error);
     return mockContacts;
   }
-  return data || [];
 }
 
 export async function getRadarAlerts(): Promise<RadarAlert[]> {
   noStore();
+
+  if (hasPostgresEnv()) {
+    try {
+      return await getAlertsFromPostgres();
+    } catch (error) {
+      console.error("Postgres getRadarAlerts error:", error);
+    }
+  }
+
   if (!hasSupabaseEnv()) return mockAlerts;
-  const supabase = createServiceClient();
-  const { data, error } = await supabase
-    .from("radar_alerts_with_festival")
-    .select("*")
-    .eq("status", "open")
-    .order("created_at", { ascending: false })
-    .limit(80);
-  if (error) {
-    console.error(error);
+
+  try {
+    const supabase = createServiceClient();
+
+    const { data, error } = await supabase
+      .from("radar_alerts_with_festival")
+      .select("*")
+      .eq("status", "open")
+      .order("created_at", { ascending: false })
+      .limit(80);
+
+    if (error) {
+      console.error(error);
+      return mockAlerts;
+    }
+
+    return data || [];
+  } catch (error) {
+    console.error("Supabase getRadarAlerts fetch failed:", error);
     return mockAlerts;
   }
-  return data || [];
 }
 
 export async function getProposals(): Promise<Proposal[]> {
   noStore();
+
+  if (hasPostgresEnv()) {
+    try {
+      return await getProposalsFromPostgres();
+    } catch (error) {
+      console.error("Postgres getProposals error:", error);
+    }
+  }
+
   if (!hasSupabaseEnv()) return mockProposals;
-  const supabase = createServiceClient();
-  const { data, error } = await supabase
-    .from("proposals_with_festival")
-    .select("*")
-    .order("created_at", { ascending: false })
-    .limit(120);
-  if (error) {
-    console.error(error);
+
+  try {
+    const supabase = createServiceClient();
+
+    const { data, error } = await supabase
+      .from("proposals_with_festival")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(120);
+
+    if (error) {
+      console.error(error);
+      return mockProposals;
+    }
+
+    return data || [];
+  } catch (error) {
+    console.error("Supabase getProposals fetch failed:", error);
     return mockProposals;
   }
-  return data || [];
 }
 
 export async function getDashboardData() {
   noStore();
+
   const [festivals, contacts, alerts, proposals] = await Promise.all([
     getFestivals(),
     getContacts(),
