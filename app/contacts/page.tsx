@@ -1,3 +1,6 @@
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 import { Shell } from "@/components/Shell";
 import { ContactList } from "@/components/ContactList";
 import { getContacts } from "@/lib/data";

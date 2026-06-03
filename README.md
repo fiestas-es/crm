@@ -1,3 +1,13 @@
+# Fiestas Radar v5
+
+Versión corregida para que Vercel/Next no deje páginas cacheadas después de actualizar Supabase.
+
+Cambios clave:
+- Páginas de dashboard/festivales/contactos/propuestas/radar marcadas como dinámicas.
+- `noStore()` en las consultas a Supabase.
+- Endpoint de comprobación: `/api/debug/counts`.
+- Mapa SVG mejorado de España y seed público de 86 festivales candidatos.
+
 # Fiestas Radar
 
 Aplicación interna para @fiestas_es: CRM visual de festivales de España, contactos, tramos de venta, radar semanal y generador de propuestas comerciales.

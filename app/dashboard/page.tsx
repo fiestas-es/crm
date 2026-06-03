@@ -1,3 +1,6 @@
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 import { Shell } from "@/components/Shell";
 import { StatCard } from "@/components/StatCard";
 import { FestivalCard } from "@/components/FestivalCard";
@@ -37,7 +40,7 @@ export default async function DashboardPage() {
               <p className="eyebrow">Mapa visual</p>
               <h2>España festivalera</h2>
             </div>
-            <span className="badge green">Demo visual</span>
+            <span className="badge green">Mapa real</span>
           </div>
           <FestivalMap festivals={festivals} />
         </div>

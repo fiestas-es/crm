@@ -1,8 +1,10 @@
+import { unstable_noStore as noStore } from "next/cache";
 import { createServiceClient, hasSupabaseEnv } from "./supabase/service";
 import { mockAlerts, mockContacts, mockFestivals, mockProposals } from "./mock-data";
 import type { Contact, FestivalOverview, Proposal, RadarAlert } from "./types";
 
 export async function getFestivals(): Promise<FestivalOverview[]> {
+  noStore();
   if (!hasSupabaseEnv()) return mockFestivals;
   const supabase = createServiceClient();
   const { data, error } = await supabase
@@ -25,6 +27,7 @@ export async function getFestival(id: string) {
 }
 
 export async function getContacts(festivalId?: string): Promise<Contact[]> {
+  noStore();
   if (!hasSupabaseEnv()) return mockContacts;
   const supabase = createServiceClient();
 
@@ -55,6 +58,7 @@ export async function getContacts(festivalId?: string): Promise<Contact[]> {
 }
 
 export async function getRadarAlerts(): Promise<RadarAlert[]> {
+  noStore();
   if (!hasSupabaseEnv()) return mockAlerts;
   const supabase = createServiceClient();
   const { data, error } = await supabase
@@ -71,6 +75,7 @@ export async function getRadarAlerts(): Promise<RadarAlert[]> {
 }
 
 export async function getProposals(): Promise<Proposal[]> {
+  noStore();
   if (!hasSupabaseEnv()) return mockProposals;
   const supabase = createServiceClient();
   const { data, error } = await supabase
@@ -86,6 +91,7 @@ export async function getProposals(): Promise<Proposal[]> {
 }
 
 export async function getDashboardData() {
+  noStore();
   const [festivals, contacts, alerts, proposals] = await Promise.all([
     getFestivals(),
     getContacts(),
