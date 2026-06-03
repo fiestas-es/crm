@@ -1,3 +1,14 @@
+export type CommercialStage =
+  | "nuevo"
+  | "pendiente_revisar"
+  | "contactado"
+  | "interesado"
+  | "propuesta_enviada"
+  | "negociando"
+  | "cerrado"
+  | "rechazado"
+  | "finalizado";
+
 export type FestivalOverview = {
   festival_id: string;
   edition_id?: string | null;
@@ -5,6 +16,8 @@ export type FestivalOverview = {
   slug?: string | null;
   official_website?: string | null;
   instagram_url?: string | null;
+  tiktok_url?: string | null;
+  ticket_url?: string | null;
   main_genres?: string[] | null;
   year?: number | null;
   start_date?: string | null;
@@ -17,12 +30,17 @@ export type FestivalOverview = {
   longitude?: number | null;
   avg_attendance?: number | null;
   expected_attendance?: number | null;
+  ticket_min_price?: number | null;
+  ticket_max_price?: number | null;
   sales_stage?: string | null;
   lifecycle_stage?: string | null;
+  commercial_stage?: CommercialStage | string | null;
   ticket_status?: string | null;
   opportunity_score?: number | null;
   last_checked_at?: string | null;
   data_confidence?: string | null;
+  source_url?: string | null;
+  notes?: string | null;
 };
 
 export type Contact = {

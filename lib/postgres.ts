@@ -24,9 +24,7 @@ export function getPostgresDebugInfo() {
 
   return {
     hasPostgresUrl: Boolean(url),
-    postgresUrlPreview: url
-      ? url.slice(0, 18) + "..." + url.slice(-18)
-      : null
+    postgresUrlPreview: url ? url.slice(0, 18) + "..." + url.slice(-18) : null
   };
 }
 

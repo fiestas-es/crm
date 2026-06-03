@@ -2,7 +2,7 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 import { Shell } from "@/components/Shell";
-import { FestivalCard } from "@/components/FestivalCard";
+import { FestivalFilters } from "@/components/FestivalFilters";
 import { AddFestivalForm } from "@/components/AddFestivalForm";
 import { getFestivals } from "@/lib/data";
 
@@ -11,29 +11,22 @@ export default async function FestivalsPage() {
 
   return (
     <Shell>
-      <div className="topbar">
+      <div className="topbar hero-v7">
         <div>
           <p className="eyebrow">Base maestra</p>
           <h1>Festivales de España</h1>
-          <p className="muted">Listado visual con scoring, tramos, fechas, ciudad y datos comerciales.</p>
+          <p className="muted">Listado visual con scoring, tramos, fechas, ciudad, precios, asistencia y estado comercial.</p>
         </div>
       </div>
 
-      <div className="searchbar">
-        <input className="input" placeholder="Buscar festival, ciudad, provincia..." />
-        <select className="select" defaultValue=""><option value="">Comunidad</option></select>
-        <select className="select" defaultValue=""><option value="">Mes</option></select>
-        <select className="select" defaultValue=""><option value="">Tramo</option></select>
-        <select className="select" defaultValue="score"><option value="score">Orden: prioridad</option></select>
-      </div>
+      <FestivalFilters festivals={festivals} />
 
-      <div className="grid three">
-        {festivals.map((festival) => <FestivalCard key={festival.festival_id} festival={festival} />)}
-      </div>
-
-      <div style={{ marginTop: 26 }}>
+      <section className="card add-festival-card-v7" id="nuevo">
+        <p className="eyebrow">Nuevo festival</p>
+        <h2>Añadir oportunidad manual</h2>
+        <p className="muted">Útil para meter rápido un festival detectado por Instagram, prensa, contacto directo o ticketera.</p>
         <AddFestivalForm />
-      </div>
+      </section>
     </Shell>
   );
 }

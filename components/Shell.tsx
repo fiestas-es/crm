@@ -11,33 +11,37 @@ const nav = [
 
 export function Shell({ children }: { children: React.ReactNode }) {
   return (
-    <div className="app-shell">
-      <aside className="sidebar">
-        <Link href="/dashboard" className="brand">
-          <div className="brand-mark">FR</div>
-          <div>
+    <div className="app-shell app-shell-v7">
+      <aside className="sidebar sidebar-v7">
+        <Link href="/dashboard" className="brand brand-v7">
+          <span className="brand-mark brand-mark-v7">
+            <img src="/brand/icon.svg" alt="Fiestas" />
+          </span>
+          <span>
             <strong>Fiestas Radar</strong>
             <small>Festival CRM interno</small>
-          </div>
+          </span>
         </Link>
 
-        <nav className="nav">
+        <nav className="nav nav-v7">
           {nav.map((item) => (
-            <Link key={item.href} href={item.href}>
-              <span>{item.icon}</span> {item.label}
+            <Link href={item.href} key={item.href}>
+              <span>{item.icon}</span>
+              {item.label}
             </Link>
           ))}
-          <form action="/api/logout" method="post">
+          <form action="/logout" method="post">
             <button type="submit"><span>🔒</span> Salir</button>
           </form>
         </nav>
 
         <div className="sidebar-footer">
-          <strong>@fiestas_es</strong><br />
-          Radar de oportunidades, contactos y propuestas. Actualización semanal preparada para cron.
+          <strong>@fiestas_es</strong>
+          <br />
+          Radar comercial, contactos, propuestas y seguimiento semanal.
         </div>
       </aside>
-      <main className="main">{children}</main>
+      <main className="main main-v7">{children}</main>
     </div>
   );
 }

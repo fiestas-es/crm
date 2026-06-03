@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 import { Shell } from "@/components/Shell";
+import { RunRadarButton } from "@/components/RunRadarButton";
 import { getRadarAlerts, getFestivals } from "@/lib/data";
 import { formatDate } from "@/lib/utils";
 
@@ -11,45 +12,44 @@ export default async function RadarPage() {
 
   return (
     <Shell>
-      <div className="topbar">
+      <div className="topbar hero-v7">
         <div>
           <p className="eyebrow">Actualización semanal</p>
           <h1>Radar de cambios</h1>
-          <p className="muted">Busca nuevos festivales, detecta cambios y deja alertas para revisar. No sustituye la validación humana.</p>
+          <p className="muted">Busca nuevos festivales, detecta cambios públicos y deja alertas para revisar. No envía mensajes automáticamente.</p>
         </div>
-        <form action="/api/radar/run" method="post">
-          <button className="btn primary" type="submit">Ejecutar radar ahora</button>
-        </form>
+        <RunRadarButton />
       </div>
 
-      <section className="card" style={{ marginBottom: 18 }}>
-        <div className="card-top">
-          <div>
-            <p className="eyebrow">Estado del radar</p>
-            <h2>Para que importe festivales reales necesitas una API key</h2>
-            <p className="muted">Si al ejecutar ves “Sin TICKETMASTER_API_KEY o Supabase”, el sistema está funcionando, pero todavía no tiene fuente automática conectada.</p>
-          </div>
-          <span className="badge orange">Pendiente de fuente</span>
+      <section className="grid three radar-status-v7">
+        <div className="card">
+          <p className="eyebrow">Fuente automática</p>
+          <h2>Ticketmaster Discovery API</h2>
+          <p className="muted">España · música · keyword festival/sound/live/fest. Se complementa con validación humana y fuentes oficiales.</p>
         </div>
-        <div className="kv">
-          <div><span>Fuente automática preparada</span><strong>Ticketmaster Discovery API</strong></div>
-          <div><span>Filtro inicial</span><strong>España · música · festival</strong></div>
-          <div><span>Resultado esperado</span><strong>Nuevos festivales + alertas de revisión</strong></div>
-          <div><span>Asistencia +5.000</span><strong>Se valida con fuente/estimación, no se inventa</strong></div>
+        <div className="card">
+          <p className="eyebrow">Resultado esperado</p>
+          <h2>Nuevos festivales + alertas</h2>
+          <p className="muted">Actualiza fechas, venue, ticket URL, precios cuando existan y crea alerta de revisión.</p>
+        </div>
+        <div className="card">
+          <p className="eyebrow">Asistencia +5.000</p>
+          <h2>Estimación, no invención</h2>
+          <p className="muted">La asistencia se valida con fuentes públicas, histórico o manualmente desde la ficha.</p>
         </div>
       </section>
 
       <section className="grid two">
-        <div className="card">
+        <div className="card alerts-v7">
           <p className="eyebrow">Alertas abiertas</p>
           <h2>Revisión del equipo</h2>
-          <div className="grid">
+          <div className="alert-list-v7">
             {alerts.map((alert) => (
-              <article key={alert.id} className="pipeline-item">
-                <span className={`badge ${alert.severity === "high" ? "red" : alert.severity === "medium" ? "orange" : "blue"}`}>{alert.severity}</span>
-                <h3 style={{ marginTop: 12 }}>{alert.title}</h3>
+              <article className="alert-card-v7" key={alert.id}>
+                <span className={`badge ${alert.severity === "high" ? "red" : "orange"}`}>{alert.severity}</span>
+                <h3>{alert.title}</h3>
                 <p className="muted">{alert.festival_name ? `${alert.festival_name} · ` : ""}{alert.description}</p>
-                <p className="soft">{alert.created_at ? formatDate(alert.created_at) : ""}</p>
+                <small className="soft">{alert.created_at ? formatDate(alert.created_at) : ""}</small>
               </article>
             ))}
           </div>
@@ -58,13 +58,13 @@ export default async function RadarPage() {
         <div className="card">
           <p className="eyebrow">Top prioridad</p>
           <h2>Contactar primero</h2>
-          <div className="grid">
-            {hot.slice(0, 8).map((festival) => (
-              <article key={festival.festival_id} className="pipeline-item">
+          <div className="hot-list-v7">
+            {hot.slice(0, 14).map((festival) => (
+              <a className="hot-row-v7" href={`/festivals/${festival.slug || festival.festival_id}`} key={festival.festival_id}>
                 <strong>{festival.name}</strong>
-                <p className="muted">{festival.city || "—"} · {festival.sales_stage || festival.lifecycle_stage || "Sin estado"}</p>
-                <a className="badge green" href={`/festivals/${festival.festival_id}`}>Abrir ficha · Score {festival.opportunity_score}</a>
-              </article>
+                <span>{festival.city || "—"} · {festival.commercial_stage || festival.sales_stage || festival.lifecycle_stage || "Sin estado"}</span>
+                <b>{festival.opportunity_score}</b>
+              </a>
             ))}
           </div>
         </div>
