@@ -361,43 +361,50 @@ tr:hover td { background: rgba(255,255,255,.035); }
   .card-metrics { grid-template-columns: 1fr; }
 }
 
-/* v3: mapa de España por coordenadas reales */
+/* v4: mapa de España con SVG realista + puntos por coordenadas */
 .spain-map {
   position: relative;
   min-height: 430px;
   overflow: hidden;
   border-radius: 28px;
   background:
-    radial-gradient(circle at 72% 26%, rgba(126, 87, 255, .22), transparent 32%),
-    radial-gradient(circle at 38% 70%, rgba(0, 245, 184, .14), transparent 36%),
+    radial-gradient(circle at 70% 23%, rgba(126, 87, 255, .22), transparent 32%),
+    radial-gradient(circle at 38% 72%, rgba(0, 245, 184, .14), transparent 36%),
     linear-gradient(145deg, rgba(10, 18, 35, .96), rgba(7, 9, 20, .98));
   border: 1px solid rgba(255,255,255,.09);
 }
-.spain-outline {
+.spain-svg {
   position: absolute;
-  inset: 12% 11% 12% 10%;
-  border-radius: 46% 55% 42% 50% / 32% 36% 50% 54%;
-  transform: rotate(-7deg);
-  background: linear-gradient(135deg, rgba(255,255,255,.09), rgba(255,255,255,.025));
-  border: 1px solid rgba(255,255,255,.12);
-  clip-path: polygon(7% 33%, 17% 16%, 38% 10%, 58% 12%, 78% 20%, 89% 39%, 82% 58%, 67% 66%, 52% 78%, 30% 82%, 16% 67%);
+  inset: 5% 4% 5% 4%;
+  width: 92%;
+  height: 90%;
+  opacity: .96;
+  z-index: 0;
+}
+.spain-mainland, .island {
+  fill: url(#spainFill);
+  stroke: rgba(255,255,255,.20);
+  stroke-width: .55;
+}
+.spain-border {
+  fill: none;
+  stroke: rgba(255,255,255,.12);
+  stroke-width: .35;
+}
+.map-geo-label {
+  fill: rgba(255,255,255,.42);
+  font-size: 2.1px;
+  font-weight: 800;
+  letter-spacing: .14em;
 }
 .map-grid-lines {
   position: absolute;
   inset: 0;
   background-image: linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
   background-size: 52px 52px;
-  opacity: .26;
+  opacity: .20;
+  z-index: 1;
 }
-.canary-label, .balearic-label {
-  position: absolute;
-  font-size: 11px;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-  color: rgba(255,255,255,.42);
-}
-.canary-label { left: 10%; bottom: 9%; }
-.balearic-label { right: 11%; top: 45%; }
 .spain-map .map-point {
   position: absolute;
   width: 15px;
@@ -405,7 +412,7 @@ tr:hover td { background: rgba(255,255,255,.035); }
   border-radius: 999px;
   transform: translate(-50%, -50%);
   box-shadow: 0 0 0 7px rgba(255,255,255,.07), 0 0 22px rgba(255,255,255,.24);
-  z-index: 2;
+  z-index: 3;
 }
 .spain-map .map-point::after {
   content: "";
@@ -421,7 +428,7 @@ tr:hover td { background: rgba(255,255,255,.035); }
   white-space: nowrap;
   padding: 6px 9px;
   border-radius: 10px;
-  background: rgba(3, 5, 12, .76);
+  background: rgba(3, 5, 12, .80);
   color: white;
   font-size: 12px;
   opacity: 0;
@@ -430,3 +437,4 @@ tr:hover td { background: rgba(255,255,255,.035); }
   transform: translateY(4px);
 }
 .spain-map .map-point:hover .map-label { opacity: 1; transform: translateY(0); }
+

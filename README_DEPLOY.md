@@ -44,3 +44,22 @@ La contraseña solo cambia en despliegues nuevos.
 5. Entra en `/radar` y pulsa “Ejecutar radar ahora”.
 
 El radar importa candidatos. La asistencia +5.000 debe validarse con fuente, histórico o estimación interna antes de usarse comercialmente.
+
+## V4: cargar base inicial pública de festivales España
+
+Esta versión incluye:
+
+- `data/festivales_espana_public_seed.csv`: base inicial editable.
+- `supabase/seed_public_festivals_spain.sql`: SQL para cargar la base inicial en Supabase.
+- Mapa SVG de España con puntos calculados por latitud/longitud.
+
+Para cargar la base:
+
+1. Abre Supabase.
+2. Ve a SQL Editor.
+3. Abre `supabase/seed_public_festivals_spain.sql` en GitHub.
+4. Copia todo.
+5. Pega en SQL Editor.
+6. Pulsa Run.
+
+Los datos son una base comercial inicial orientativa. Cada ficha conserva nivel de confianza y debe validarse antes de contactar.
