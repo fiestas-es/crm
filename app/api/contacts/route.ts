@@ -20,6 +20,7 @@ export async function POST(request: Request) {
       email: body.email || null,
       phone: body.phone || null,
       instagram: body.instagram || null,
+      linkedin: body.linkedin || null,
       source: body.source || "manual",
       legal_basis: body.legal_basis || "pendiente de validar",
       notes: body.notes || null
@@ -33,9 +34,10 @@ export async function POST(request: Request) {
     await supabase.from("festival_contacts").insert({
       festival_id: body.festival_id,
       contact_id: contact.id,
-      responsibility: body.role || "contacto",
-      priority: "media",
-      relationship_status: "nuevo"
+      responsibility: body.responsibility || body.role || "contacto",
+      priority: body.priority || "media",
+      relationship_status: body.relationship_status || "nuevo",
+      owner_name: body.owner_name || null
     });
   }
 

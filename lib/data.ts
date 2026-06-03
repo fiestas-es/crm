@@ -37,7 +37,13 @@ export async function getContacts(festivalId?: string): Promise<Contact[]> {
       console.error(error);
       return [];
     }
-    return (data || []).map((row: any) => row.contacts).filter(Boolean);
+    return (data || []).map((row: any) => ({
+      ...(row.contacts || {}),
+      responsibility: row.responsibility || row.contacts?.role || null,
+      priority: row.priority || null,
+      relationship_status: row.relationship_status || null,
+      owner_name: row.owner_name || null
+    })).filter((contact: any) => contact.id);
   }
 
   const { data, error } = await supabase.from("contacts").select("*").order("updated_at", { ascending: false }).limit(500);

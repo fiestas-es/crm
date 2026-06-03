@@ -12,12 +12,29 @@ export default async function RadarPage() {
         <div>
           <p className="eyebrow">Actualización semanal</p>
           <h1>Radar de cambios</h1>
-          <p className="muted">Cambios de tramo, festivales nuevos, oportunidades calientes y datos a revisar.</p>
+          <p className="muted">Busca nuevos festivales, detecta cambios y deja alertas para revisar. No sustituye la validación humana.</p>
         </div>
         <form action="/api/radar/run" method="post">
           <button className="btn primary" type="submit">Ejecutar radar ahora</button>
         </form>
       </div>
+
+      <section className="card" style={{ marginBottom: 18 }}>
+        <div className="card-top">
+          <div>
+            <p className="eyebrow">Estado del radar</p>
+            <h2>Para que importe festivales reales necesitas una API key</h2>
+            <p className="muted">Si al ejecutar ves “Sin TICKETMASTER_API_KEY o Supabase”, el sistema está funcionando, pero todavía no tiene fuente automática conectada.</p>
+          </div>
+          <span className="badge orange">Pendiente de fuente</span>
+        </div>
+        <div className="kv">
+          <div><span>Fuente automática preparada</span><strong>Ticketmaster Discovery API</strong></div>
+          <div><span>Filtro inicial</span><strong>España · música · festival</strong></div>
+          <div><span>Resultado esperado</span><strong>Nuevos festivales + alertas de revisión</strong></div>
+          <div><span>Asistencia +5.000</span><strong>Se valida con fuente/estimación, no se inventa</strong></div>
+        </div>
+      </section>
 
       <section className="grid two">
         <div className="card">
@@ -43,7 +60,7 @@ export default async function RadarPage() {
               <article key={festival.festival_id} className="pipeline-item">
                 <strong>{festival.name}</strong>
                 <p className="muted">{festival.city || "—"} · {festival.sales_stage || festival.lifecycle_stage || "Sin estado"}</p>
-                <span className="badge green">Score {festival.opportunity_score}</span>
+                <a className="badge green" href={`/festivals/${festival.festival_id}`}>Abrir ficha · Score {festival.opportunity_score}</a>
               </article>
             ))}
           </div>

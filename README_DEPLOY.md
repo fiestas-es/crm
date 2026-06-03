@@ -15,3 +15,32 @@ CRON_SECRET=tu_clave_cron
 NEXT_PUBLIC_SUPABASE_URL=https://dkhneoilxvysmrijuwzfb.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=tu_publishable_key
 SUPABASE_SERVICE_ROLE_KEY=tu_secret_key
+
+## v3 — Cambios incluidos
+
+- Mapa del dashboard basado en coordenadas reales de cada festival.
+- Responsables dentro de cada ficha de festival: marketing, patrocinios, prensa, dirección, ticketing, producción y agencia.
+- El generador de propuestas se usa desde cada festival y permite Email, WhatsApp, Instagram DM y llamada.
+- La página Propuestas funciona como histórico de borradores.
+- La página Radar explica si falta `TICKETMASTER_API_KEY` y evita duplicar alertas en ejecuciones repetidas.
+
+## Cambiar contraseña del equipo
+
+En Vercel:
+
+1. Project → Settings → Environment Variables.
+2. Edita `TEAM_ACCESS_PASSWORD`.
+3. Guarda.
+4. Project → Deployments → Redeploy.
+
+La contraseña solo cambia en despliegues nuevos.
+
+## Activar investigación automática de festivales
+
+1. Crea una API key en Ticketmaster Developer.
+2. Vercel → Settings → Environment Variables.
+3. Añade `TICKETMASTER_API_KEY`.
+4. Redeploy.
+5. Entra en `/radar` y pulsa “Ejecutar radar ahora”.
+
+El radar importa candidatos. La asistencia +5.000 debe validarse con fuente, histórico o estimación interna antes de usarse comercialmente.

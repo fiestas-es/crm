@@ -38,6 +38,10 @@ export type Contact = {
   legal_basis?: string | null;
   do_not_contact?: boolean | null;
   notes?: string | null;
+  responsibility?: string | null;
+  priority?: string | null;
+  relationship_status?: string | null;
+  owner_name?: string | null;
 };
 
 export type RadarAlert = {

@@ -31,7 +31,7 @@ export default async function FestivalDetailPage({ params }: FestivalDetailPageP
         <div className="card">
           <p className="eyebrow">Acción sugerida</p>
           <h2>{(festival.opportunity_score || 0) >= 80 ? "Contactar esta semana" : "Mantener en seguimiento"}</h2>
-          <p className="muted">Genera una propuesta adaptada al canal y registra el contacto antes de enviar.</p>
+          <p className="muted">Primero añade o elige el responsable correcto. Después genera email, WhatsApp, DM de Instagram o guion de llamada.</p>
           <a className="btn primary" href="#propuesta">Generar propuesta</a>
         </div>
       </section>
@@ -53,8 +53,8 @@ export default async function FestivalDetailPage({ params }: FestivalDetailPageP
         </div>
 
         <div className="card">
-          <p className="eyebrow">Contactos</p>
-          <h2>Responsables asociados</h2>
+          <p className="eyebrow">Equipo interno del festival</p>
+          <h2>Responsables asociados a esta ficha</h2>
           <ContactList contacts={contacts} />
         </div>
       </section>
