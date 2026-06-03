@@ -6,12 +6,15 @@ import { Shell } from "@/components/Shell";
 import { StatCard } from "@/components/StatCard";
 import { FestivalFilters } from "@/components/FestivalFilters";
 import { SpainFestivalMap } from "@/components/SpainFestivalMap";
-import { EditablePipelineBoard } from "@/components/EditablePipelineBoard";
 import { getDashboardData } from "@/lib/data";
 
 export default async function DashboardPage() {
   const { festivals, alerts, stats } = await getDashboardData();
+
   const topFestivals = festivals.slice(0, 9);
+  const mapFestivals = festivals
+    .filter((festival) => festival.latitude && festival.longitude)
+    .slice(0, 40);
 
   return (
     <Shell>
@@ -19,7 +22,9 @@ export default async function DashboardPage() {
         <div>
           <p className="eyebrow">Radar comercial</p>
           <h1>Festivales, contactos y oportunidades en un solo sitio.</h1>
-          <p className="muted">Vista rápida para decidir a qué festivales contactar, cuándo y con qué propuesta.</p>
+          <p className="muted">
+            Vista rápida para decidir a qué festivales contactar, cuándo y con qué propuesta.
+          </p>
         </div>
         <div className="actions">
           <Link className="btn" href="/radar">Ver radar semanal</Link>
@@ -41,20 +46,27 @@ export default async function DashboardPage() {
               <p className="eyebrow">Mapa visual</p>
               <h2>España festivalera</h2>
             </div>
-            <span className="badge green">Coordenadas reales</span>
+            <Link className="badge green" href="/festivals">
+              Ver todos
+            </Link>
           </div>
-          <SpainFestivalMap festivals={festivals} />
+          <SpainFestivalMap festivals={mapFestivals} />
         </div>
 
         <div className="card alerts-v7">
           <p className="eyebrow">Alertas</p>
           <h2>Cambios que requieren acción</h2>
           <div className="alert-list-v7">
-            {alerts.slice(0, 6).map((alert) => (
+            {alerts.slice(0, 4).map((alert) => (
               <article className="alert-card-v7" key={alert.id}>
-                <span className={`badge ${alert.severity === "high" ? "red" : "orange"}`}>{alert.severity}</span>
+                <span className={`badge ${alert.severity === "high" ? "red" : "orange"}`}>
+                  {alert.severity}
+                </span>
                 <h3>{alert.title}</h3>
-                <p className="muted">{alert.festival_name ? `${alert.festival_name} · ` : ""}{alert.description}</p>
+                <p className="muted">
+                  {alert.festival_name ? `${alert.festival_name} · ` : ""}
+                  {alert.description}
+                </p>
               </article>
             ))}
           </div>
@@ -69,8 +81,13 @@ export default async function DashboardPage() {
 
       <section className="card pipeline-card-v7">
         <p className="eyebrow">Pipeline</p>
-        <h2>Estado comercial editable</h2>
-        <EditablePipelineBoard festivals={festivals} />
+        <h2>Estado comercial</h2>
+        <p className="muted">
+          El pipeline completo está en “Radar semanal” para evitar cargar todos los festivales en el dashboard.
+        </p>
+        <Link className="btn primary" href="/radar">
+          Abrir pipeline
+        </Link>
       </section>
     </Shell>
   );
