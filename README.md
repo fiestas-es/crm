@@ -1,11 +1,11 @@
-# Fiestas Radar v5
+# Fiestas Radar v6 — diagnóstico Supabase/Vercel
 
 Versión corregida para que Vercel/Next no deje páginas cacheadas después de actualizar Supabase.
 
 Cambios clave:
 - Páginas de dashboard/festivales/contactos/propuestas/radar marcadas como dinámicas.
 - `noStore()` en las consultas a Supabase.
-- Endpoint de comprobación: `/api/debug/counts`.
+- Endpoint de comprobación ampliado: `/api/debug/counts` muestra variables enmascaradas y prueba fetch directo.
 - Mapa SVG mejorado de España y seed público de 86 festivales candidatos.
 
 # Fiestas Radar
